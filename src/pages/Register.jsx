@@ -14,6 +14,7 @@ export default function Register() {
   });
 
   const [errorMessage, setErrorMessage] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -34,7 +35,11 @@ export default function Register() {
     }
 
     try {
-      const response = await axios.post('http://localhost:30091/api/user/register', {
+      setLoading(true);
+
+      // ✅ Use the correct backend URL (port 30090)
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:30090';
+      const response = await axios.post(`${API_BASE_URL}/api/user/register`, {
         name,
         email,
         phone,
@@ -50,6 +55,8 @@ export default function Register() {
       }
     } catch (error) {
       setErrorMessage('Failed to register. Please try again later.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -58,41 +65,12 @@ export default function Register() {
       <div className="auth-box">
         <h2>Create Your TravelSathi Account</h2>
 
-        <input
-          type="text"
-          name="name"
-          placeholder="Full Name"
-          value={formData.name}
-          onChange={handleChange}
-        />
-        <input
-          type="email"
-          name="email"
-          placeholder="Email Address"
-          value={formData.email}
-          onChange={handleChange}
-        />
-        <input
-          type="text"
-          name="phone"
-          placeholder="Phone Number"
-          value={formData.phone}
-          onChange={handleChange}
-        />
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
-        />
-        <input
-          type="password"
-          name="confirmPassword"
-          placeholder="Confirm Password"
-          value={formData.confirmPassword}
-          onChange={handleChange}
-        />
+        <input type="text" name="name" placeholder="Full Name" value={formData.name} onChange={handleChange} />
+        <input type="email" name="email" placeholder="Email Address" value={formData.email} onChange={handleChange} />
+        <input type="text" name="phone" placeholder="Phone Number" value={formData.phone} onChange={handleChange} />
+        <input type="password" name="password" placeholder="Password" value={formData.password} onChange={handleChange} />
+        <input type="password" name="confirmPassword" placeholder="Confirm Password" value={formData.confirmPassword} onChange={handleChange} />
+        
         <select name="role" value={formData.role} onChange={handleChange}>
           <option value="USER">User</option>
           <option value="ADMIN">Admin</option>
@@ -100,8 +78,8 @@ export default function Register() {
 
         {errorMessage && <p className="error">{errorMessage}</p>}
 
-        <button className="btn" onClick={handleRegister}>
-          Register
+        <button className="btn" onClick={handleRegister} disabled={loading}>
+          {loading ? 'Registering...' : 'Register'}
         </button>
 
         <p className="switch-text">
@@ -111,3 +89,4 @@ export default function Register() {
     </div>
   );
 }
+
